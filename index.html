@@ -1,0 +1,1468 @@
+<!doctype html>
+<html lang="be">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Math Quest — матэматычная віктарына</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <style>
+            /* ===== RESET & BASE ===== */
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+            html {
+                width: 100%;
+            }
+            body {
+                font-family:
+                    "Segoe UI",
+                    system-ui,
+                    -apple-system,
+                    sans-serif;
+                background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+                color: #e0e0e0;
+                min-height: 100vh;
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 16px;
+            }
+            /* ===== APP SHELL ===== */
+            .app-shell {
+                max-width: 860px;
+                width: 100%;
+            }
+            /* ===== HEADER ===== */
+            .app-header {
+                text-align: center;
+                margin-bottom: 24px;
+            }
+            .app-title {
+                font-size: 2.4rem;
+                font-weight: 800;
+                background: linear-gradient(135deg, #f7971e, #ffd200);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+            .app-subtitle {
+                color: #a0a0b8;
+                font-size: 1rem;
+                margin-top: 4px;
+            }
+            .header-stats {
+                display: flex;
+                gap: 16px;
+                justify-content: center;
+                margin-top: 12px;
+            }
+            .stat-card {
+                background: rgba(255, 255, 255, 0.06);
+                backdrop-filter: blur(6px);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: 10px;
+                padding: 8px 18px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                min-width: 100px;
+            }
+            .stat-label {
+                font-size: 0.72rem;
+                color: #8888aa;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            .stat-value {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: #ffd200;
+            }
+            /* ===== PANELS ===== */
+            .panel {
+                background: rgba(255, 255, 255, 0.05);
+                backdrop-filter: blur(8px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 16px;
+                padding: 20px 24px;
+                margin-bottom: 16px;
+            }
+            .section-title {
+                font-size: 0.82rem;
+                color: #8888aa;
+                text-transform: uppercase;
+                letter-spacing: 0.8px;
+                margin-bottom: 12px;
+                font-weight: 600;
+            }
+            /* ===== CHIPS (topics) ===== */
+            .chip-group {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-bottom: 16px;
+            }
+            .chip {
+                background: rgba(255, 255, 255, 0.06);
+                border: 1px solid rgba(255, 255, 255, 0.12);
+                color: #c0c0d8;
+                padding: 7px 16px;
+                border-radius: 20px;
+                cursor: pointer;
+                font-size: 0.88rem;
+                transition: 0.2s;
+                font-family: inherit;
+            }
+            .chip:hover {
+                background: rgba(255, 255, 255, 0.12);
+            }
+            .chip--active {
+                background: linear-gradient(135deg, #f7971e, #ffd200);
+                color: #1a1a2e;
+                border-color: #ffd200;
+                font-weight: 600;
+            }
+            /* ===== DIGIT CHECKS ===== */
+            .digits-panel {
+                display: none;
+                margin-top: -6px;
+                margin-bottom: 4px;
+            }
+            .digits-panel--visible {
+                display: block;
+            }
+            .digits-panel .section-title {
+                margin-bottom: 8px;
+            }
+            .digit-checks {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            .digit-check {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                cursor: pointer;
+                background: rgba(255, 255, 255, 0.04);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: 8px;
+                padding: 5px 10px;
+                font-size: 0.85rem;
+                color: #a0a0b8;
+                transition: 0.2s;
+            }
+            .digit-check:hover {
+                border-color: rgba(255, 210, 0, 0.3);
+                background: rgba(255, 210, 0, 0.04);
+            }
+            .digit-check input[type="checkbox"] {
+                accent-color: #ffd200;
+                width: 16px;
+                height: 16px;
+                cursor: pointer;
+            }
+            .digit-check--on {
+                color: #e0e0e8;
+                border-color: rgba(255, 210, 0, 0.25);
+            }
+            /* ===== MODE CARDS ===== */
+            .mode-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: 10px;
+                margin-bottom: 16px;
+            }
+            .mode-card {
+                background: rgba(255, 255, 255, 0.04);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: 12px;
+                padding: 14px;
+                cursor: pointer;
+                text-align: left;
+                transition: 0.2s;
+                font-family: inherit;
+                color: inherit;
+                font-size: 0.92rem;
+            }
+            .mode-card:hover {
+                border-color: rgba(255, 210, 0, 0.4);
+                background: rgba(255, 210, 0, 0.05);
+            }
+            .mode-card--active {
+                border-color: #ffd200;
+                background: rgba(255, 210, 0, 0.08);
+            }
+            .mode-label {
+                font-weight: 600;
+                display: block;
+                margin-bottom: 4px;
+                color: #e8e8f0;
+            }
+            .mode-meta {
+                font-size: 0.78rem;
+                color: #8888aa;
+                display: block;
+            }
+            .inline-field {
+                margin-top: 8px;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 0.82rem;
+                color: #aaaac8;
+            }
+            .inline-field input[type="number"] {
+                background: rgba(255, 255, 255, 0.08);
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                border-radius: 6px;
+                color: #fff;
+                padding: 3px 8px;
+                width: 60px;
+                font-size: 0.88rem;
+                font-family: inherit;
+            }
+            /* ===== BUTTONS ===== */
+            .control-actions {
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+                margin-top: 6px;
+            }
+            .btn {
+                padding: 10px 24px;
+                border-radius: 10px;
+                border: none;
+                cursor: pointer;
+                font-size: 0.95rem;
+                font-weight: 600;
+                transition: 0.2s;
+                font-family: inherit;
+            }
+            .btn-primary {
+                background: linear-gradient(135deg, #f7971e, #ffd200);
+                color: #1a1a2e;
+            }
+            .btn-primary:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 20px rgba(255, 210, 0, 0.25);
+            }
+            .btn-secondary {
+                background: rgba(255, 255, 255, 0.08);
+                color: #c0c0d8;
+            }
+            .btn-secondary:hover {
+                background: rgba(255, 255, 255, 0.14);
+            }
+            .btn-ghost {
+                background: transparent;
+                color: #8888aa;
+                padding: 10px 16px;
+            }
+            .btn-ghost:hover {
+                color: #c0c0d8;
+            }
+            .btn[disabled] {
+                opacity: 0.4;
+                cursor: not-allowed;
+                transform: none !important;
+            }
+            /* ===== QUIZ AREA ===== */
+            .badge-row {
+                display: flex;
+                gap: 8px;
+                flex-wrap: wrap;
+                margin-bottom: 10px;
+            }
+            .badge {
+                background: rgba(255, 210, 0, 0.12);
+                color: #ffd200;
+                padding: 3px 12px;
+                border-radius: 12px;
+                font-size: 0.75rem;
+                font-weight: 500;
+            }
+            .quiz-header__status {
+                margin-bottom: 14px;
+            }
+            .progress__track {
+                height: 4px;
+                background: rgba(255, 255, 255, 0.08);
+                border-radius: 2px;
+                overflow: hidden;
+                margin-bottom: 8px;
+            }
+            .progress__bar {
+                height: 100%;
+                width: 0%;
+                background: linear-gradient(90deg, #f7971e, #ffd200);
+                border-radius: 2px;
+                transition: width 0.3s;
+            }
+            .status-row {
+                display: flex;
+                justify-content: space-between;
+                font-size: 0.85rem;
+                color: #8888aa;
+            }
+            .timer {
+                font-variant-numeric: tabular-nums;
+                color: #ffd200;
+                font-weight: 600;
+            }
+            /* ===== QUESTION ===== */
+            .helper-text {
+                color: #8888aa;
+                font-size: 0.95rem;
+                padding: 20px 0;
+                text-align: center;
+            }
+            .question-card {
+                animation: fadeIn 0.3s ease;
+            }
+            .question-main {
+                margin-bottom: 16px;
+                padding-bottom: 12px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            }
+            .question-label {
+                font-size: 0.78rem;
+                color: #8888aa;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 6px;
+            }
+            .question-text {
+                font-size: 1.5rem;
+                font-weight: 600;
+                color: #f0f0ff;
+                line-height: 1.4;
+            }
+            .answer-form {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                align-items: flex-end;
+                margin-bottom: 12px;
+            }
+            .field {
+                flex: 1;
+                min-width: 140px;
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+            }
+            .field-label {
+                font-size: 0.78rem;
+                color: #8888aa;
+            }
+            #answer-input {
+                background: rgba(255, 255, 255, 0.06);
+                border: 1px solid rgba(255, 255, 255, 0.12);
+                border-radius: 10px;
+                color: #fff;
+                padding: 10px 14px;
+                font-size: 1.1rem;
+                width: 100%;
+                font-family: inherit;
+                outline: none;
+                transition: 0.2s;
+            }
+            #answer-input:focus {
+                border-color: #ffd200;
+            }
+            .answer-actions {
+                display: flex;
+                gap: 8px;
+                align-items: flex-end;
+                padding-bottom: 2px;
+            }
+            .feedback {
+                padding: 10px 14px;
+                border-radius: 10px;
+                font-size: 0.88rem;
+                font-weight: 500;
+                margin-top: 4px;
+            }
+            .feedback--correct {
+                background: rgba(0, 200, 100, 0.12);
+                color: #4ade80;
+                border: 1px solid rgba(0, 200, 100, 0.2);
+            }
+            .feedback--incorrect {
+                background: rgba(255, 60, 60, 0.12);
+                color: #f87171;
+                border: 1px solid rgba(255, 60, 60, 0.2);
+            }
+            /* ===== QUIZ FOOTER ===== */
+            .quiz-footer .scoreline {
+                display: flex;
+                gap: 16px;
+                font-size: 0.9rem;
+                margin-bottom: 8px;
+                color: #c0c0d8;
+            }
+            .quiz-footer .scoreline span {
+                font-weight: 500;
+            }
+            .pill-row {
+                display: flex;
+                gap: 12px;
+                flex-wrap: wrap;
+                margin-bottom: 12px;
+            }
+            .pill {
+                background: rgba(255, 255, 255, 0.06);
+                padding: 4px 14px;
+                border-radius: 16px;
+                font-size: 0.82rem;
+                color: #a0a0b8;
+            }
+            .footer-actions {
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+            /* ===== SUMMARY ===== */
+            .summary-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 10px;
+                margin-bottom: 16px;
+            }
+            .summary-card {
+                background: rgba(255, 255, 255, 0.04);
+                border: 1px solid rgba(255, 255, 255, 0.06);
+                border-radius: 12px;
+                padding: 12px;
+                text-align: center;
+            }
+            .summary-label {
+                font-size: 0.72rem;
+                color: #8888aa;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            .summary-value {
+                font-size: 1.6rem;
+                font-weight: 700;
+                color: #ffd200;
+            }
+
+            /* ===== HELP ===== */
+            .help-details {
+                font-size: 0.85rem;
+                color: #8888aa;
+            }
+            .help-details summary {
+                cursor: pointer;
+                font-weight: 500;
+                color: #a0a0b8;
+                margin-bottom: 6px;
+            }
+            .help-details ul {
+                padding-left: 20px;
+                line-height: 1.7;
+            }
+            /* ===== ANIMATIONS ===== */
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(8px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            /* ===== RESPONSIVE ===== */
+            @media (max-width: 600px) {
+                .app-title {
+                    font-size: 1.8rem;
+                }
+                .mode-grid {
+                    grid-template-columns: 1fr;
+                }
+                .answer-form {
+                    flex-direction: column;
+                }
+                .answer-actions {
+                    width: 100%;
+                }
+                .answer-actions .btn {
+                    flex: 1;
+                }
+                .header-stats {
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+                .stat-card {
+                    min-width: 0;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="app-shell">
+            <header class="app-header">
+                <h1 class="app-title">Math Quest</h1>
+                <p class="app-subtitle">
+                    Практыкуйся ў матэматыцы ў розных рэжымах і тэмах.
+                </p>
+                <div class="header-stats">
+                    <div class="stat-card">
+                        <span class="stat-label">Лепшая серыя</span>
+                        <span class="stat-value" id="best-streak">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Усяго правільных</span>
+                        <span class="stat-value" id="total-correct">0</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- ===== CONTROLS ===== -->
+            <section class="panel" id="controls-panel">
+                <h2 class="section-title">1. Абяры тэму</h2>
+                <div class="chip-group" role="radiogroup">
+                    <button
+                        class="chip chip--active"
+                        role="radio"
+                        aria-checked="true"
+                        data-topic="mult"
+                    >
+                        Таблічка множання
+                    </button>
+                    <button
+                        class="chip"
+                        role="radio"
+                        aria-checked="false"
+                        data-topic="arithmetic"
+                    >
+                        Арыфметыка
+                    </button>
+                    <button
+                        class="chip"
+                        role="radio"
+                        aria-checked="false"
+                        data-topic="fractions"
+                    >
+                        Долі і дзесятковыя
+                    </button>
+                    <button
+                        class="chip"
+                        role="radio"
+                        aria-checked="false"
+                        data-topic="algebra"
+                    >
+                        Алгебра
+                    </button>
+                    <button
+                        class="chip"
+                        role="radio"
+                        aria-checked="false"
+                        data-topic="mixed"
+                    >
+                        Змешаная
+                    </button>
+                </div>
+                <div class="digits-panel" id="digits-panel">
+                    <h2 class="section-title">Лічбы для табліцы множання</h2>
+                    <div class="digit-checks">
+                        <label class="digit-check digit-check--on"
+                            ><input
+                                type="checkbox"
+                                data-digit="0"
+                                checked
+                            /><span>0</span></label
+                        >
+                        <label class="digit-check digit-check--on"
+                            ><input
+                                type="checkbox"
+                                data-digit="1"
+                                checked
+                            /><span>1</span></label
+                        >
+                        <label class="digit-check digit-check--on"
+                            ><input
+                                type="checkbox"
+                                data-digit="2"
+                                checked
+                            /><span>2</span></label
+                        >
+                        <label class="digit-check digit-check--on"
+                            ><input
+                                type="checkbox"
+                                data-digit="3"
+                                checked
+                            /><span>3</span></label
+                        >
+                        <label class="digit-check digit-check--on"
+                            ><input
+                                type="checkbox"
+                                data-digit="4"
+                                checked
+                            /><span>4</span></label
+                        >
+                        <label class="digit-check digit-check--on"
+                            ><input
+                                type="checkbox"
+                                data-digit="5"
+                                checked
+                            /><span>5</span></label
+                        >
+                        <label class="digit-check digit-check--on"
+                            ><input
+                                type="checkbox"
+                                data-digit="6"
+                                checked
+                            /><span>6</span></label
+                        >
+                        <label class="digit-check digit-check--on"
+                            ><input
+                                type="checkbox"
+                                data-digit="7"
+                                checked
+                            /><span>7</span></label
+                        >
+                        <label class="digit-check digit-check--on"
+                            ><input
+                                type="checkbox"
+                                data-digit="8"
+                                checked
+                            /><span>8</span></label
+                        >
+                        <label class="digit-check digit-check--on"
+                            ><input
+                                type="checkbox"
+                                data-digit="9"
+                                checked
+                            /><span>9</span></label
+                        >
+                    </div>
+                </div>
+                <h2 class="section-title">2. Абяры рэжым</h2>
+                <div class="mode-grid" role="radiogroup">
+                    <button
+                        class="mode-card mode-card--active"
+                        role="radio"
+                        aria-checked="true"
+                        data-mode="fixed"
+                    >
+                        <span class="mode-label">Фіксаваная колькасць</span>
+                        <span class="mode-meta"
+                            >Адкажы на зададзеную колькасць пытанняў</span
+                        >
+                        <label class="inline-field"
+                            >Пытанні:
+                            <input
+                                id="fixed-count"
+                                type="number"
+                                min="5"
+                                max="50"
+                                step="5"
+                                value="10"
+                            />
+                        </label>
+                    </button>
+                    <button
+                        class="mode-card"
+                        role="radio"
+                        aria-checked="false"
+                        data-mode="timed"
+                    >
+                        <span class="mode-label">На час</span>
+                        <span class="mode-meta"
+                            >Спяшайся і набяры як мага больш балаў</span
+                        >
+                        <label class="inline-field"
+                            >Хвіліны:
+                            <input
+                                id="timed-minutes"
+                                type="number"
+                                min="1"
+                                max="20"
+                                step="1"
+                                value="2"
+                            />
+                        </label>
+                    </button>
+                    <button
+                        class="mode-card"
+                        role="radio"
+                        aria-checked="false"
+                        data-mode="endless"
+                    >
+                        <span class="mode-label">Бясконцая практыка</span>
+                        <span class="mode-meta">Працягвай колькі захочаш</span>
+                    </button>
+                </div>
+                <div class="control-actions">
+                    <button id="start-btn" class="btn btn-primary">
+                        Пачаць віктарыну
+                    </button>
+                    <button id="reset-stats-btn" class="btn btn-ghost">
+                        Скінуць агульную статыстыку
+                    </button>
+                </div>
+            </section>
+
+            <!-- ===== QUIZ AREA ===== -->
+            <section class="panel" id="quiz-area" hidden>
+                <header class="quiz-header">
+                    <div class="badge-row">
+                        <span class="badge" id="mode-badge"
+                            >Рэжым: фіксаваная колькасць</span
+                        >
+                        <span class="badge" id="topic-badge"
+                            >Тэма: арыфметыка</span
+                        >
+                    </div>
+                    <div class="quiz-header__status">
+                        <div class="progress__track">
+                            <div
+                                class="progress__bar"
+                                id="question-progress"
+                            ></div>
+                        </div>
+                        <div class="status-row">
+                            <span id="question-counter">Пытанне 0 з 0</span>
+                            <span id="timer" class="timer">00:00</span>
+                        </div>
+                    </div>
+                </header>
+                <div class="question-card" id="question-card" hidden>
+                    <div class="question-main">
+                        <p class="question-label" id="question-label">
+                            Цяперашняе пытанне
+                        </p>
+                        <p class="question-text" id="question-text">
+                            Колькі будзе 3 + 5?
+                        </p>
+                    </div>
+                    <form
+                        id="answer-form"
+                        class="answer-form"
+                        autocomplete="off"
+                    >
+                        <div class="field">
+                            <span class="field-label">Твой адказ</span>
+                            <input
+                                id="answer-input"
+                                type="text"
+                                inputmode="decimal"
+                                autocomplete="off"
+                                required
+                            />
+                        </div>
+                        <div class="answer-actions">
+                            <button
+                                id="submit-answer-btn"
+                                class="btn btn-primary"
+                                type="submit"
+                            >
+                                Праверыць адказ
+                            </button>
+                            <button
+                                id="skip-btn"
+                                class="btn btn-secondary"
+                                type="button"
+                            >
+                                Прапусціць
+                            </button>
+                        </div>
+                    </form>
+                    <div class="feedback" id="feedback"></div>
+                </div>
+                <footer class="quiz-footer" id="quiz-footer" hidden>
+                    <div class="scoreline">
+                        <span id="score-summary">Вынік: 0 / 0</span>
+                        <span id="accuracy-summary">Дакладнасць: 0%</span>
+                    </div>
+                    <div class="pill-row">
+                        <span class="pill" id="streak-pill">Серыя: 0</span>
+                        <span class="pill" id="speed-pill">Сярэдні час: —</span>
+                    </div>
+                    <div class="footer-actions">
+                        <button id="next-question-btn" class="btn btn-primary">
+                            Наступнае пытанне
+                        </button>
+                        <button id="end-quiz-btn" class="btn btn-ghost">
+                            Скончыць віктарыну
+                        </button>
+                    </div>
+                </footer>
+            </section>
+
+            <!-- ===== SUMMARY ===== -->
+            <section class="panel" id="summary-panel" hidden>
+                <h2 class="section-title">Вынікі сесіі</h2>
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <span class="summary-label">Правільныя</span
+                        ><span class="summary-value" id="summary-correct"
+                            >0</span
+                        >
+                    </div>
+                    <div class="summary-card">
+                        <span class="summary-label">Памылковыя</span
+                        ><span class="summary-value" id="summary-incorrect"
+                            >0</span
+                        >
+                    </div>
+                    <div class="summary-card">
+                        <span class="summary-label">Дакладнасць</span
+                        ><span class="summary-value" id="summary-accuracy"
+                            >0%</span
+                        >
+                    </div>
+                    <div class="summary-card">
+                        <span class="summary-label">Адказаныя</span
+                        ><span class="summary-value" id="summary-total">0</span>
+                    </div>
+                </div>
+                <button id="play-again-btn" class="btn btn-primary">
+                    Прайсці віктарыну яшчэ раз
+                </button>
+            </section>
+
+            <!-- ===== HELP ===== -->
+            <section class="panel" style="padding: 12px 16px">
+                <details class="help-details">
+                    <summary>Як Math Quest падлічвае балы?</summary>
+                    <ul>
+                        <li>Кожны правільны адказ дае +1 бал.</li>
+                        <li>
+                            Серыі з 3+ правільных адказаў паляпшаюць лепшую
+                            серыю.
+                        </li>
+                        <li>
+                            У рэжыме на час вынік — колькі правільных адказаў ты
+                            паспееш да заканчэння часу.
+                        </li>
+                        <li>
+                            У бясконцым рэжыме можна спыніцца ў любы момант і
+                            паглядзець статыстыку.
+                        </li>
+                    </ul>
+                </details>
+            </section>
+        </div>
+
+        <script>
+            "use strict";
+            /* ===== STATE ===== */
+            const S = {
+                topic: "mult",
+                mode: "fixed",
+                fixedCount: 10,
+                timedMinutes: 2,
+                isRunning: false,
+                isWaitingNext: false,
+                questionIndex: 0,
+                questionsAnswered: 0,
+                correctAnswers: 0,
+                incorrectAnswers: 0,
+                streak: 0,
+                bestStreak: 0,
+                totalCorrectAllTime: 0,
+                startTimeMs: 0,
+                questionStartMs: 0,
+                totalQuestionTimeMs: 0,
+                timerInterval: null,
+                timedModeDeadline: 0,
+            };
+
+            /* ===== DOM REFS ===== */
+            const $ = (id) => document.getElementById(id);
+            const topicChips = document.querySelectorAll("[data-topic]");
+            const modeCards = document.querySelectorAll("[data-mode]");
+            const answerInput = $("answer-input");
+            const feedbackEl = $("feedback");
+            const controlsPanel = $("controls-panel");
+            const quizArea = $("quiz-area");
+            const questionCard = $("question-card");
+            const quizFooter = $("quiz-footer");
+            const summaryPanel = $("summary-panel");
+
+            /* ===== UTILITY ===== */
+            const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+            const fmtPct = (n, t) =>
+                t === 0 ? "0%" : Math.round((n / t) * 100) + "%";
+            const fmtTime = (s) => {
+                const m = Math.floor(s / 60),
+                    sec = s % 60;
+                return (
+                    String(m).padStart(2, "0") +
+                    ":" +
+                    String(sec).padStart(2, "0")
+                );
+            };
+            const fmtAvg = (ms) => {
+                if (!ms || !S.questionsAnswered) return "—";
+                const avg = ms / S.questionsAnswered;
+                return avg < 1e3
+                    ? Math.round(avg) + " мс"
+                    : (avg / 1e3).toFixed(1) + " с";
+            };
+            const randInt = (min, max) =>
+                Math.floor(Math.random() * (max - min + 1)) + min;
+
+            /* ===== CONFETTI (pure canvas, no CDN) ===== */
+            let confettiParticles = [];
+            function launchConfetti() {
+                const c = document.createElement("canvas");
+                c.style.cssText =
+                    "position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9999";
+                c.width = window.innerWidth;
+                c.height = window.innerHeight;
+                document.body.appendChild(c);
+                const ctx = c.getContext("2d");
+                for (let i = 0; i < 120; i++) {
+                    confettiParticles.push({
+                        x: Math.random() * c.width,
+                        y: -20 - Math.random() * c.height * 0.5,
+                        w: randInt(6, 12),
+                        h: randInt(4, 8),
+                        color: `hsl(${randInt(0, 360)},80%,60%)`,
+                        vx: (Math.random() - 0.5) * 4,
+                        vy: randInt(2, 6) * 1.5,
+                        rot: Math.random() * 360,
+                        rv: (Math.random() - 0.5) * 8,
+                        life: 1,
+                    });
+                }
+                let frames = 0;
+                const maxFrames = 120;
+                function draw() {
+                    frames++;
+                    ctx.clearRect(0, 0, c.width, c.height);
+                    let alive = false;
+                    for (const p of confettiParticles) {
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.vy += 0.08;
+                        p.rot += p.rv;
+                        p.life = Math.max(0, 1 - frames / maxFrames);
+                        if (p.life <= 0) continue;
+                        alive = true;
+                        ctx.save();
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate((p.rot * Math.PI) / 180);
+                        ctx.globalAlpha = p.life;
+                        ctx.fillStyle = p.color;
+                        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                        ctx.restore();
+                    }
+                    if (alive && frames < maxFrames)
+                        requestAnimationFrame(draw);
+                    else {
+                        c.remove();
+                        confettiParticles = [];
+                    }
+                }
+                draw();
+            }
+            function confettiSmall() {
+                const c = document.createElement("canvas");
+                c.style.cssText =
+                    "position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9999";
+                c.width = window.innerWidth;
+                c.height = window.innerHeight;
+                document.body.appendChild(c);
+                const ctx = c.getContext("2d");
+                const parts = [];
+                for (let i = 0; i < 40; i++) {
+                    parts.push({
+                        x: c.width / 2,
+                        y: c.height / 2,
+                        w: randInt(4, 8),
+                        h: randInt(3, 6),
+                        color: `hsl(${randInt(0, 360)},80%,60%)`,
+                        vx: (Math.random() - 0.5) * 8,
+                        vy: (Math.random() - 0.5) * 8 - 4,
+                        rot: Math.random() * 360,
+                        rv: (Math.random() - 0.5) * 12,
+                        life: 1,
+                    });
+                }
+                let frames = 0;
+                function draw() {
+                    frames++;
+                    ctx.clearRect(0, 0, c.width, c.height);
+                    let alive = false;
+                    for (const p of parts) {
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.vy += 0.1;
+                        p.rot += p.rv;
+                        p.life = Math.max(0, 1 - frames / 80);
+                        if (p.life <= 0) continue;
+                        alive = true;
+                        ctx.save();
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate((p.rot * Math.PI) / 180);
+                        ctx.globalAlpha = p.life;
+                        ctx.fillStyle = p.color;
+                        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                        ctx.restore();
+                    }
+                    if (alive && frames < 80) requestAnimationFrame(draw);
+                    else {
+                        c.remove();
+                    }
+                }
+                draw();
+            }
+
+            /* ===== QUESTION GENERATORS ===== */
+            function gcd(a, b) {
+                while (b) {
+                    [a, b] = [b, a % b];
+                }
+                return a;
+            }
+            /* ===== MULT DECK (no repeats) ===== */
+            let multDeck = [];
+            let multDeckIndex = 0;
+            function shuffleMultDeck() {
+                const digits = getSelectedDigits();
+                multDeck = [];
+                for (const a of digits) {
+                    for (const b of digits) {
+                        multDeck.push({ a, b, answer: a * b });
+                    }
+                }
+                for (let i = multDeck.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [multDeck[i], multDeck[j]] = [multDeck[j], multDeck[i]];
+                }
+                multDeckIndex = 0;
+            }
+            function getSelectedDigits() {
+                const checks = document.querySelectorAll(".digit-check input");
+                const digits = [];
+                checks.forEach((cb) => {
+                    if (cb.checked) digits.push(+cb.dataset.digit);
+                });
+                return digits.length ? digits : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+            }
+            function qMultTable() {
+                if (multDeckIndex >= multDeck.length) {
+                    shuffleMultDeck();
+                }
+                const item = multDeck[multDeckIndex++];
+                return {
+                    label: "Таблічка множання",
+                    text: item.a + " × " + item.b,
+                    answer: item.answer,
+                };
+            }
+            function qArithmetic() {
+                const ops = ["+", "-", "×", "÷"];
+                const op = ops[randInt(0, 3)];
+                let a, b, label, text, answer;
+                if (op === "+") {
+                    a = randInt(1, 99);
+                    b = randInt(1, 99);
+                    label = "Складанне";
+                    text = `${a} + ${b}`;
+                    answer = a + b;
+                } else if (op === "-") {
+                    a = randInt(10, 99);
+                    b = randInt(1, a);
+                    label = "Адніманне";
+                    text = `${a} − ${b}`;
+                    answer = a - b;
+                } else if (op === "×") {
+                    a = randInt(2, 12);
+                    b = randInt(2, 12);
+                    label = "Множанне";
+                    text = `${a} × ${b}`;
+                    answer = a * b;
+                } else {
+                    a = randInt(2, 10);
+                    b = randInt(2, 10);
+                    let p = a * b;
+                    label = "Дзяленне";
+                    text = `${p} ÷ ${a}`;
+                    answer = b;
+                }
+                return { label, text, answer: +answer.toFixed(2) };
+            }
+            function qFractions() {
+                const t = randInt(0, 2);
+                if (t === 0) {
+                    const ds = [2, 3, 4, 5, 6, 8, 10];
+                    const d = ds[randInt(0, ds.length - 1)];
+                    const n = randInt(1, d - 1);
+                    const g = gcd(n, d);
+                    const val = n / d;
+                    return {
+                        label: "Дробы → дзесятковы",
+                        text: `Запішы ${n / g}/${d / g} як дзесятковы дроб`,
+                        answer: +val.toFixed(3),
+                    };
+                } else if (t === 1) {
+                    const val = randInt(1, 99) / 100;
+                    const pct = Math.round(val * 100);
+                    return {
+                        label: "Дзесятковы → працэнты",
+                        text: `Запішы ${val.toFixed(2)} як працэнты (толькі лік)`,
+                        answer: pct,
+                    };
+                } else {
+                    const pct = randInt(5, 95);
+                    return {
+                        label: "Працэнты → дроб",
+                        text: `Запішы ${pct}% як нясокрачальны дроб (напрыклад 3/4)`,
+                        answer: `спрабуй яшчэ`,
+                    };
+                }
+            }
+            function qAlgebra() {
+                const t = randInt(0, 2);
+                if (t === 0) {
+                    const a = randInt(2, 10),
+                        x = randInt(1, 10),
+                        b = randInt(1, 20),
+                        c = a * x + b;
+                    return {
+                        label: "Лінейнае ўраўненне",
+                        text: `${a}x + ${b} = ${c}. Знайдзі x`,
+                        answer: x,
+                    };
+                } else if (t === 1) {
+                    const x = randInt(1, 10),
+                        k = randInt(2, 6),
+                        d = k * x;
+                    return {
+                        label: "Ураўненне з дзяленнем",
+                        text: `${d} ÷ x = ${k}. Знайдзі x`,
+                        answer: x,
+                    };
+                } else {
+                    const a = randInt(2, 5),
+                        x = randInt(2, 6),
+                        b = a * x;
+                    return {
+                        label: "Множанне",
+                        text: `${a} · x = ${b}. Знайдзі x`,
+                        answer: x,
+                    };
+                }
+            }
+
+            function generateQuestion() {
+                const topic =
+                    S.mode === "mixed"
+                        ? ["arithmetic", "fractions", "algebra", "mult"][
+                              randInt(0, 3)
+                          ]
+                        : S.topic;
+                if (topic === "arithmetic") return qArithmetic();
+                if (topic === "fractions") return qFractions();
+                if (topic === "algebra") return qAlgebra();
+                if (topic === "mult") return qMultTable();
+                return qArithmetic();
+            }
+
+            /* ===== UI UPDATES ===== */
+            function updateBadges() {
+                const ml = {
+                    fixed: "Фіксаваная колькасць",
+                    timed: "На час",
+                    endless: "Бясконцая практыка",
+                };
+                const tl = {
+                    arithmetic: "арыфметыка",
+                    fractions: "долі і дзесятковыя",
+                    algebra: "алгебра",
+                    mixed: "змешаная",
+                    mult: "таблічка множання",
+                };
+                $("mode-badge").textContent = "Рэжым: " + ml[S.mode];
+                $("topic-badge").textContent = "Тэма: " + tl[S.topic];
+            }
+            function updateHeaderStats() {
+                $("best-streak").textContent = S.bestStreak;
+                $("total-correct").textContent = S.totalCorrectAllTime;
+            }
+            function updateScoreline() {
+                const t = S.correctAnswers + S.incorrectAnswers;
+                $("score-summary").textContent =
+                    `Вынік: ${S.correctAnswers} / ${t}`;
+                $("accuracy-summary").textContent =
+                    `Дакладнасць: ${fmtPct(S.correctAnswers, t)}`;
+                $("streak-pill").textContent = `Серыя: ${S.streak}`;
+                $("speed-pill").textContent =
+                    `Сярэдні час: ${fmtAvg(S.totalQuestionTimeMs)}`;
+            }
+            function updateQuestionProgress() {
+                if (S.mode === "fixed") {
+                    const t = S.fixedCount;
+                    $("question-progress").style.width =
+                        (S.questionIndex / t) * 100 + "%";
+                    $("question-counter").textContent =
+                        `Пытанне ${S.questionIndex} з ${t}`;
+                } else if (S.mode === "timed") {
+                    $("question-counter").textContent =
+                        `Пытанне ${S.questionIndex}`;
+                    $("question-progress").style.width = "0%";
+                } else {
+                    $("question-counter").textContent =
+                        `Пытанне ${S.questionIndex}`;
+                    $("question-progress").style.width = "0%";
+                }
+            }
+            function resetFeedback() {
+                feedbackEl.className = "feedback";
+                feedbackEl.textContent = "";
+            }
+            function setRunningUI(running) {
+                controlsPanel.hidden = running;
+                quizArea.hidden = !running;
+                summaryPanel.hidden = true;
+                questionCard.hidden = !running;
+                quizFooter.hidden = true;
+                if (!running) {
+                    S.isRunning = false;
+                    clearInterval(S.timerInterval);
+                }
+            }
+
+            /* ===== TIMER ===== */
+            function updateTimerDisplay() {
+                if (S.mode === "timed") {
+                    const ms = S.timedModeDeadline - Date.now();
+                    if (ms <= 0) {
+                        $("timer").textContent = "00:00";
+                        endQuiz();
+                        return;
+                    }
+                    $("timer").textContent = fmtTime(Math.ceil(ms / 1000));
+                } else {
+                    $("timer").textContent = fmtTime(
+                        Math.floor((Date.now() - S.startTimeMs) / 1000),
+                    );
+                }
+            }
+
+            /* ===== QUIZ LIFECYCLE ===== */
+            function startQuiz() {
+                S.questionIndex = 0;
+                S.questionsAnswered = 0;
+                S.correctAnswers = 0;
+                S.incorrectAnswers = 0;
+                S.streak = 0;
+                S.totalQuestionTimeMs = 0;
+                S.isWaitingNext = false;
+                S.isRunning = true;
+                S.startTimeMs = Date.now();
+                $("timer").textContent = "00:00";
+                if (S.mode === "timed")
+                    S.timedModeDeadline =
+                        Date.now() + S.timedMinutes * 60 * 1000;
+                clearInterval(S.timerInterval);
+                S.timerInterval = setInterval(updateTimerDisplay, 200);
+                shuffleMultDeck();
+                setRunningUI(true);
+                updateBadges();
+                askNextQuestion();
+            }
+            function askNextQuestion() {
+                S.questionIndex++;
+                resetFeedback();
+                answerInput.value = "";
+                answerInput.disabled = false;
+                answerInput.focus();
+                $("submit-answer-btn").disabled = false;
+                $("skip-btn").disabled = false;
+                S.isWaitingNext = false;
+                S.questionStartMs = Date.now();
+                const q = generateQuestion();
+                S.currentAnswer = q.answer;
+                $("question-label").textContent = q.label;
+                $("question-text").textContent = q.text;
+                questionCard.hidden = false;
+                quizFooter.hidden = false;
+                updateQuestionProgress();
+                updateScoreline();
+                updateBadges();
+            }
+            function finishQuestion(correct) {
+                const elapsed = Date.now() - S.questionStartMs;
+                S.questionsAnswered++;
+                S.totalQuestionTimeMs += elapsed;
+                if (correct) {
+                    S.correctAnswers++;
+                    S.streak++;
+                    S.totalCorrectAllTime++;
+                    S.bestStreak = Math.max(S.bestStreak, S.streak);
+                    feedbackEl.className = "feedback feedback--correct";
+                    feedbackEl.textContent = "✅ Правільна!";
+                    if (S.streak >= 3) launchConfetti();
+                    else confettiSmall();
+                } else {
+                    S.incorrectAnswers++;
+                    S.streak = 0;
+                    feedbackEl.className = "feedback feedback--incorrect";
+                    feedbackEl.textContent =
+                        "❌ Памылка. Правільны адказ: " + S.currentAnswer;
+                }
+                answerInput.disabled = true;
+                $("submit-answer-btn").disabled = true;
+                $("skip-btn").disabled = true;
+                S.isWaitingNext = true;
+                updateScoreline();
+                updateHeaderStats();
+
+                if (S.mode === "fixed" && S.questionIndex >= S.fixedCount) {
+                    endQuiz();
+                    return;
+                }
+                if (S.mode === "timed" && Date.now() >= S.timedModeDeadline) {
+                    endQuiz();
+                    return;
+                }
+            }
+            function checkAnswer() {
+                const raw = answerInput.value.trim();
+                if (!raw) return;
+                let isCorrect = false;
+                const expected = S.currentAnswer;
+                if (typeof expected === "number" || !isNaN(expected)) {
+                    const user = parseFloat(raw);
+                    if (!isNaN(user))
+                        isCorrect = Math.abs(user - expected) < 0.001;
+                    else isCorrect = false;
+                } else {
+                    isCorrect =
+                        raw.toLowerCase() === String(expected).toLowerCase();
+                }
+                finishQuestion(isCorrect);
+            }
+            function skipQuestion() {
+                finishQuestion(false);
+            }
+            function endQuiz() {
+                clearInterval(S.timerInterval);
+                S.isRunning = false;
+                questionCard.hidden = true;
+                quizFooter.hidden = true;
+                const t = S.correctAnswers + S.incorrectAnswers;
+                $("summary-correct").textContent = S.correctAnswers;
+                $("summary-incorrect").textContent = S.incorrectAnswers;
+                $("summary-accuracy").textContent = fmtPct(S.correctAnswers, t);
+                $("summary-total").textContent = t;
+                summaryPanel.hidden = false;
+                updateHeaderStats();
+                if (S.correctAnswers > 0 && S.correctAnswers >= t / 2)
+                    launchConfetti();
+            }
+            function resetGlobalStats() {
+                S.bestStreak = 0;
+                S.totalCorrectAllTime = 0;
+                updateHeaderStats();
+            }
+            function resetForNewSession() {
+                setRunningUI(false);
+                S.isWaitingNext = false;
+                clearInterval(S.timerInterval);
+                $("timer").textContent = "00:00";
+                $("question-progress").style.width = "0%";
+                $("question-counter").textContent = "Пытанне 0 з 0";
+            }
+
+            /* ===== EVENTS ===== */
+            topicChips.forEach((b) => {
+                b.addEventListener("click", () => {
+                    topicChips.forEach((c) => {
+                        c.classList.remove("chip--active");
+                        c.setAttribute("aria-checked", "false");
+                    });
+                    b.classList.add("chip--active");
+                    b.setAttribute("aria-checked", "true");
+                    S.topic = b.dataset.topic;
+                    const panel = document.getElementById("digits-panel");
+                    if (panel) {
+                        panel.classList.toggle(
+                            "digits-panel--visible",
+                            b.dataset.topic === "mult",
+                        );
+                    }
+                });
+            });
+            modeCards.forEach((b) => {
+                b.addEventListener("click", () => {
+                    modeCards.forEach((c) => {
+                        c.classList.remove("mode-card--active");
+                        c.setAttribute("aria-checked", "false");
+                    });
+                    b.classList.add("mode-card--active");
+                    b.setAttribute("aria-checked", "true");
+                    S.mode = b.dataset.mode;
+                });
+            });
+            $("fixed-count").addEventListener("change", () => {
+                S.fixedCount = clamp(+$("fixed-count").value || 10, 5, 50);
+            });
+            $("timed-minutes").addEventListener("change", () => {
+                S.timedMinutes = clamp(+$("timed-minutes").value || 2, 1, 20);
+            });
+            $("start-btn").addEventListener("click", startQuiz);
+            $("reset-stats-btn").addEventListener("click", resetGlobalStats);
+            $("answer-form").addEventListener("submit", (e) => {
+                e.preventDefault();
+                if (!S.isWaitingNext && S.isRunning) {
+                    checkAnswer();
+                } else if (S.isWaitingNext && S.isRunning) {
+                    askNextQuestion();
+                }
+            });
+            document.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    if (S.isWaitingNext && S.isRunning) {
+                        e.preventDefault();
+                        askNextQuestion();
+                    } else if (!S.isRunning && !summaryPanel.hidden) {
+                        e.preventDefault();
+                        resetForNewSession();
+                    } else if (!S.isRunning && !controlsPanel.hidden) {
+                        e.preventDefault();
+                        startQuiz();
+                    }
+                }
+            });
+            $("skip-btn").addEventListener("click", skipQuestion);
+            $("next-question-btn").addEventListener("click", () => {
+                if (S.isRunning) askNextQuestion();
+            });
+            $("end-quiz-btn").addEventListener("click", endQuiz);
+            $("play-again-btn").addEventListener("click", resetForNewSession);
+
+            /* ===== INIT: show digits panel for default mult topic ===== */
+            (function init() {
+                const panel = document.getElementById("digits-panel");
+                if (panel) {
+                    panel.classList.add("digits-panel--visible");
+                }
+                document
+                    .querySelectorAll(".digit-check input")
+                    .forEach((cb) => {
+                        cb.addEventListener("change", function () {
+                            this.parentElement.classList.toggle(
+                                "digit-check--on",
+                                this.checked,
+                            );
+                        });
+                    });
+            })();
+        </script>
+    </body>
+</html>
